@@ -18,8 +18,7 @@ app.get("/tutorial", (req, res) => {
 
 app.get("/test", (req, res) => {
   res.json({
-    test: testData,
-    tutorial: tutorialData,
+    data: testData,
   });
 });
 
