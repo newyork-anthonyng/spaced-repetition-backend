@@ -1,22 +1,26 @@
 const path = require("path");
 const express = require("express");
 const app = express();
-const cors = require('cors');
-
-const { testData, tutorialData } = require("./src/testData");
+const cors = require("cors");
+const {
+  getTutorialDataFromSpreadsheet,
+  getTestDataFromSpreadsheet,
+} = require("./src/getData");
 
 app.use(express.static(path.resolve(__dirname, "public")));
 app.use(cors());
 
-app.get("/tutorial", (req, res) => {
-  console.log('GET /tutorial');
+app.get("/tutorial", async (req, res) => {
+  const tutorialData = await getTutorialDataFromSpreadsheet();
 
   res.json({
-    data: tutorialData
+    data: tutorialData,
   });
 });
 
-app.get("/test", (req, res) => {
+app.get("/test", async (req, res) => {
+  const testData = await getTestDataFromSpreadsheet();
+
   res.json({
     data: testData,
   });
