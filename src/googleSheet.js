@@ -2,6 +2,8 @@ const { GoogleSpreadsheet } = require("google-spreadsheet");
 
 const GOOGLE_SHEET_ID = `1pz6lCE9LMUJWkfwCdwxvzV2lLGjAM3DDJDIqZXi8Rz4`;
 
+console.log(process.env.GOOGLE_SHEET_PRIVATE_KEY);
+
 async function getMainSheet() {
   const doc = new GoogleSpreadsheet(GOOGLE_SHEET_ID);
 
