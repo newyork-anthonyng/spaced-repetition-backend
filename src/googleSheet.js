@@ -16,6 +16,11 @@ async function getMainSheet() {
   return sheet.getRows();
 }
 
+async function saveRow(row) {
+  await row.save();
+}
+
 module.exports = {
   getMainSheet,
+  saveRow,
 };

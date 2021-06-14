@@ -1,4 +1,4 @@
-const { getMainSheet } = require("./googleSheet");
+const { getMainSheet, saveRow } = require("./googleSheet");
 
 async function getTestDataFromSpreadsheet() {
   const rows = await getMainSheet();
@@ -85,7 +85,67 @@ async function getTutorialDataFromSpreadsheet() {
   return tutorialRows;
 }
 
+async function getWord(id) {
+  const rows = await getMainSheet();
+
+  const word = rows.find((row) => {
+    return row.ID === id;
+  });
+
+  if (!word) {
+    return null;
+  }
+
+  return word;
+}
+
+async function promoteWord(id) {
+  const word = await getWord(id);
+
+  if (!word) {
+    return;
+  }
+
+  switch (word.Box) {
+    case "1":
+      word.Box = "2";
+      break;
+    case "2":
+      word.Box = "3";
+      break;
+    case "3":
+    default:
+      break;
+  }
+
+  saveRow(word);
+}
+
+async function demoteWord(id) {
+  const word = await getWord(id);
+
+  if (!word) {
+    return;
+  }
+
+  switch (word.Box) {
+    case "3":
+      word.Box = "2";
+      break;
+    case "2":
+      word.Box = "1";
+      break;
+    case "1":
+    default:
+      break;
+  }
+
+  saveRow(word);
+}
+
 module.exports = {
   getTutorialDataFromSpreadsheet,
   getTestDataFromSpreadsheet,
+  promoteWord,
+  demoteWord,
 };
