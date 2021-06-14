@@ -5,10 +5,11 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const {
-  getTutorialDataFromSpreadsheet,
-  getTestDataFromSpreadsheet,
+  getTutorialData,
+  getTestData,
   promoteWord,
   demoteWord,
+  incrementSession,
 } = require("./src/getData");
 
 app.use(express.static(path.resolve(__dirname, "public")));
@@ -16,7 +17,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.get("/tutorial", async (req, res) => {
-  const tutorialData = await getTutorialDataFromSpreadsheet();
+  const TEST_ID = `a0c6cb0d-37a2-48a4-b84f-2ed46c4b9e1a`;
+  incrementSession(TEST_ID);
+  const tutorialData = await getTutorialData();
 
   res.json({
     data: tutorialData,
@@ -24,7 +27,7 @@ app.get("/tutorial", async (req, res) => {
 });
 
 app.get("/test", async (req, res) => {
-  const testData = await getTestDataFromSpreadsheet();
+  const testData = await getTestData();
 
   res.json({
     data: testData,

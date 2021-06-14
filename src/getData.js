@@ -1,7 +1,22 @@
-const { getMainSheet, saveRow } = require("./googleSheet");
+const { getCardsSheet, getUsersSheet, saveRow } = require("./googleSheet");
 
-async function getTestDataFromSpreadsheet() {
-  const rows = await getMainSheet();
+async function incrementSession(id) {
+  const rows = await getUsersSheet();
+
+  const user = rows.find((row) => {
+    return row.ID === id;
+  });
+
+  if (!user) {
+    return null;
+  }
+
+  user.Session = +user.Session + 1;
+  saveRow(user);
+}
+
+async function getTestData() {
+  const rows = await getCardsSheet();
 
   const data = rows.map((row, index) => {
     return {
@@ -68,8 +83,8 @@ function shuffle(array) {
   return array;
 }
 
-async function getTutorialDataFromSpreadsheet() {
-  const rows = await getMainSheet();
+async function getTutorialData() {
+  const rows = await getCardsSheet();
 
   const unstudiedRows = rows.filter((row) => {
     return !row.Studied;
@@ -86,7 +101,7 @@ async function getTutorialDataFromSpreadsheet() {
 }
 
 async function getWord(id) {
-  const rows = await getMainSheet();
+  const rows = await getCardsSheet();
 
   const word = rows.find((row) => {
     return row.ID === id;
@@ -144,8 +159,9 @@ async function demoteWord(id) {
 }
 
 module.exports = {
-  getTutorialDataFromSpreadsheet,
-  getTestDataFromSpreadsheet,
+  getTutorialData,
+  getTestData,
   promoteWord,
   demoteWord,
+  incrementSession,
 };
