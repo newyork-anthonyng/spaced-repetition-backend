@@ -1,6 +1,11 @@
 const { getCardsSheet, getUsersSheet, saveRow } = require("./googleSheet");
 
-async function incrementSession(id) {
+const TEST_USER_ID = `a0c6cb0d-37a2-48a4-b84f-2ed46c4b9e1a`;
+
+const MAX_TEST_CARD_COUNT = 10;
+const MAX_TUTORIAL_CARD_COUNT = 5;
+
+async function getUser(id) {
   const rows = await getUsersSheet();
 
   const user = rows.find((row) => {
@@ -11,25 +16,86 @@ async function incrementSession(id) {
     return null;
   }
 
+  return user;
+}
+
+async function incrementSession(id) {
+  const user = await getUser(id);
+
+  if (!user) {
+    return null;
+  }
+
   user.Session = +user.Session + 1;
   saveRow(user);
 }
 
-async function getTestData() {
-  const rows = await getCardsSheet();
+function getCandidateCards(totalCards, session) {
+  const studiedRows = totalCards.filter((row) => {
+    return !!row.studied;
+  });
 
-  const data = rows.map((row, index) => {
+  // separate cards by bucket
+  const useBox1 = true;
+  const useBox2 = session % 3 === 0;
+  const useBox3 = session % 5 === 0;
+
+  const box1 = studiedRows.filter((row) => {
+    return row.box == 1;
+  });
+  const box2 = studiedRows.filter((row) => {
+    return row.box == 2;
+  });
+  const box3 = studiedRows.filter((row) => {
+    return row.box == 3;
+  });
+
+  let result = [];
+  if (useBox3) {
+    shuffle(box3);
+    box3.forEach((item) => result.push(item));
+  }
+
+  if (useBox2) {
+    shuffle(box2);
+    box2.forEach((item) => result.push(item));
+  }
+
+  if (useBox1) {
+    shuffle(box1);
+    box1.forEach((item) => result.push(item));
+  }
+
+  return result.slice(0, MAX_TEST_CARD_COUNT);
+}
+
+async function getTestData() {
+  let rows = await getCardsSheet();
+  rows = rows.map((row, index) => {
     return {
+      id: row.ID,
       answer: row.Text,
       audio: row.Audio,
       index,
+      studied: row.Studied,
+      box: row.Box,
     };
   });
+  const user = await getUser(TEST_USER_ID);
 
-  const result = data.map((datum) => {
-    const choices = shuffle(getRandom(data, 4, datum));
+  if (!user) {
+    return;
+  }
+
+  const session = +user.Session;
+
+  const cards = getCandidateCards(rows, session);
+
+  const result = cards.map((datum) => {
+    const choices = shuffle(getRandom(rows, 4, datum));
 
     return {
+      id: datum.id,
       answer: datum.answer,
       audio: datum.audio,
       choices,
@@ -86,12 +152,15 @@ function shuffle(array) {
 async function getTutorialData() {
   const rows = await getCardsSheet();
 
-  const unstudiedRows = rows.filter((row) => {
-    return !row.Studied;
-  });
+  const unstudiedRows = rows
+    .filter((row) => {
+      return !row.Studied;
+    })
+    .slice(0, MAX_TUTORIAL_CARD_COUNT);
 
   const tutorialRows = unstudiedRows.map((row) => {
     return {
+      id: row.ID,
       text: row.Text,
       audio: row.Audio,
     };
@@ -158,10 +227,22 @@ async function demoteWord(id) {
   saveRow(word);
 }
 
+async function learnWord(id) {
+  const word = await getWord(id);
+
+  if (!word) {
+    return;
+  }
+
+  word.Studied = "Y";
+  saveRow(word);
+}
+
 module.exports = {
   getTutorialData,
   getTestData,
   promoteWord,
   demoteWord,
+  learnWord,
   incrementSession,
 };

@@ -9,20 +9,32 @@ const {
   getTestData,
   promoteWord,
   demoteWord,
+  learnWord,
   incrementSession,
 } = require("./src/getData");
+
+const TEST_USER_ID = `a0c6cb0d-37a2-48a4-b84f-2ed46c4b9e1a`;
 
 app.use(express.static(path.resolve(__dirname, "public")));
 app.use(cors());
 app.use(bodyParser.json());
 
 app.get("/tutorial", async (req, res) => {
-  const TEST_ID = `a0c6cb0d-37a2-48a4-b84f-2ed46c4b9e1a`;
-  incrementSession(TEST_ID);
+  incrementSession(TEST_USER_ID);
   const tutorialData = await getTutorialData();
 
   res.json({
     data: tutorialData,
+  });
+});
+
+app.post("/tutorial/learn", async (req, res) => {
+  const wordId = req.body.id;
+
+  learnWord(wordId);
+
+  res.json({
+    status: true,
   });
 });
 
@@ -34,7 +46,7 @@ app.get("/test", async (req, res) => {
   });
 });
 
-app.post("/promote", async (req, res) => {
+app.post("/test/promote", async (req, res) => {
   const wordId = req.body.id;
 
   promoteWord(wordId);
@@ -44,7 +56,7 @@ app.post("/promote", async (req, res) => {
   });
 });
 
-app.post("/demote", async (req, res) => {
+app.post("/test/demote", async (req, res) => {
   const wordId = req.body.id;
 
   demoteWord(wordId);
