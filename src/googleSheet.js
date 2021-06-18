@@ -11,7 +11,6 @@ async function getCardsSheet() {
   });
   await doc.loadInfo();
 
-  // const sheet = doc.sheetsByIndex[0];
   const sheet = doc.sheetsByTitle["cards"];
 
   return sheet.getRows();
@@ -35,8 +34,33 @@ async function getUsersSheet() {
   return sheet.getRows();
 }
 
+async function getLogsSheet() {
+  const doc = new GoogleSpreadsheet(GOOGLE_SHEET_ID);
+
+  await doc.useServiceAccountAuth({
+    client_email: process.env.GOOGLE_SHEET_EMAIL,
+    private_key: process.env.GOOGLE_SHEET_PRIVATE_KEY,
+  });
+  await doc.loadInfo();
+
+  const sheet = doc.sheetsByTitle["log"];
+  return sheet;
+}
+
+async function addLog({ wordId, userId, action }) {
+  const logSheet = await getLogsSheet();
+
+  await logSheet.addRow({
+    "Word ID": wordId,
+    "User ID": userId,
+    Action: action,
+    Date: Date.now(),
+  });
+}
+
 module.exports = {
   getCardsSheet,
   getUsersSheet,
   saveRow,
+  addLog,
 };

@@ -11,6 +11,7 @@ const {
   demoteWord,
   learnWord,
   incrementSession,
+  addLog,
 } = require("./src/getData");
 
 const TEST_USER_ID = `a0c6cb0d-37a2-48a4-b84f-2ed46c4b9e1a`;
@@ -32,6 +33,11 @@ app.post("/tutorial/learn", async (req, res) => {
   const wordId = req.body.id;
 
   learnWord(wordId);
+  addLog({
+    wordId,
+    userId: TEST_USER_ID,
+    action: "learn",
+  });
 
   res.json({
     status: true,
@@ -50,6 +56,11 @@ app.post("/test/promote", async (req, res) => {
   const wordId = req.body.id;
 
   promoteWord(wordId);
+  addLog({
+    wordId,
+    userId: TEST_USER_ID,
+    action: "promote",
+  });
 
   res.json({
     status: true,
@@ -60,6 +71,11 @@ app.post("/test/demote", async (req, res) => {
   const wordId = req.body.id;
 
   demoteWord(wordId);
+  addLog({
+    wordId,
+    userId: TEST_USER_ID,
+    action: "demote",
+  });
 
   res.json({
     status: true,

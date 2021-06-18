@@ -1,4 +1,9 @@
-const { getCardsSheet, getUsersSheet, saveRow } = require("./googleSheet");
+const {
+  getCardsSheet,
+  getUsersSheet,
+  saveRow,
+  addLog,
+} = require("./googleSheet");
 
 const TEST_USER_ID = `a0c6cb0d-37a2-48a4-b84f-2ed46c4b9e1a`;
 
@@ -245,4 +250,5 @@ module.exports = {
   demoteWord,
   learnWord,
   incrementSession,
+  addLog,
 };
