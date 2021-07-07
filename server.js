@@ -21,7 +21,6 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.get("/tutorial", async (req, res) => {
-  incrementSession(TEST_USER_ID);
   const tutorialData = await getTutorialData();
 
   res.json({
@@ -45,6 +44,7 @@ app.post("/tutorial/learn", async (req, res) => {
 });
 
 app.get("/test", async (req, res) => {
+  incrementSession(TEST_USER_ID);
   const testData = await getTestData();
 
   res.json({
